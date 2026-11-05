@@ -383,6 +383,7 @@ h1 em, h2 em { color: var(--green); }
 .add-button:hover:not(:disabled) { background: var(--green); color: var(--paper); }
 .error-message { background: rgba(245, 158, 11, .18); color: var(--ink); }
 .success-message { background: var(--paper-deep); color: var(--ink); }
+.demo-notice { margin-bottom: 18px; background: rgba(165, 180, 252, .35); color: var(--ink); }
 .button-outline:hover:not(:disabled), .variant-option.selected { background: rgba(165, 180, 252, .32); border-color: var(--green); color: var(--ink); }
 .story-section { background: var(--paper-deep); }
 .detail-perks p, .detail-perks, .order-row, .address-card { border-color: var(--line); }

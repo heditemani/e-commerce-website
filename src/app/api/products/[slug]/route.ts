@@ -1,6 +1,7 @@
 import { Prisma, UserRole } from "@prisma/client";
 import { z } from "zod";
 import { getSession } from "@/lib/auth";
+import { getDemoProducts } from "@/lib/catalog-data";
 import { errorResponse } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 
@@ -22,12 +23,17 @@ type RouteContext = { params: Promise<{ slug: string }> };
 export async function GET(_request: Request, { params }: RouteContext) {
   try {
     const { slug } = await params;
+    if (!process.env.DATABASE_URL) {
+      const product = getDemoProducts().find((item) => item.slug === slug);
+      if (!product) return Response.json({ error: "Product not found" }, { status: 404 });
+      return Response.json({ product, demoMode: true });
+    }
     const product = await prisma.product.findUnique({
       where: { slug },
       include: { category: { select: { name: true, slug: true } } },
     });
     if (!product) return Response.json({ error: "Product not found" }, { status: 404 });
-    return Response.json({ product });
+    return Response.json({ product, demoMode: false });
   } catch (error) {
     return errorResponse(error);
   }

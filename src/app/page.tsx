@@ -9,6 +9,7 @@ type CatalogResponse = {
   products: Product[];
   categories: { id: string; name: string; slug: string }[];
   pagination: { page: number; pages: number; total: number };
+  demoMode?: boolean;
 };
 
 export default function HomePage() {
@@ -89,6 +90,7 @@ export default function HomePage() {
           <label className="sort-control"><span>SORT</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="popular">Most loved</option><option value="newest">Just in</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option></select></label>
         </div>
         {error ? <div className="message-box error-message">{error}</div> : null}
+        {data?.demoMode ? <div className="message-box demo-notice">Preview catalog is active. Configure PostgreSQL to enable live products, accounts, and checkout.</div> : null}
         {loading ? <div className="loading-grid">{Array.from({ length: 4 }, (_, index) => <div className="skeleton" key={index} />)}</div> : null}
         {!loading && !error && data?.products.length === 0 ? <div className="empty-state"><p>No pieces found in this collection.</p><button className="text-button" onClick={() => { setCategory(""); setMinPrice(""); setMaxPrice(""); }}>Clear filters <ArrowRight size={14} /></button></div> : null}
         {!loading && !error && data?.products.length ? (

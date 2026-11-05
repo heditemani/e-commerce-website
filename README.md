@@ -17,6 +17,8 @@ A TypeScript storefront starter built with Next.js App Router, Prisma, PostgreSQ
 
 4. Visit `http://localhost:3000`, create a customer account, and try the demo checkout. Payment is simulated; no card information is collected.
 
+Without `DATABASE_URL`, the catalog and product detail pages use the included read-only preview products so the storefront can be browsed before PostgreSQL is configured. Accounts, administration, and checkout require the database.
+
 The seed script creates the starter categories. To grant an account product/order administration access, set its `role` to `ADMIN` in the database. Public sign-up never grants administrator privileges.
 
 ## API overview

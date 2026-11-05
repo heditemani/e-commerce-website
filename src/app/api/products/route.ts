@@ -1,6 +1,7 @@
 import { Prisma, UserRole } from "@prisma/client";
 import { z } from "zod";
 import { getSession } from "@/lib/auth";
+import { demoCategories, getDemoProducts } from "@/lib/catalog-data";
 import { errorResponse } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 
@@ -50,6 +51,34 @@ export async function GET(request: Request) {
             ? { createdAt: "desc" }
             : { popularity: "desc" };
 
+    if (!process.env.DATABASE_URL) {
+      const direction = query.sort.endsWith("desc") ? -1 : 1;
+      const demoResults = getDemoProducts()
+        .filter((product) =>
+          (!query.category || product.category.slug === query.category) &&
+          (minPrice === undefined || product.price >= minPrice) &&
+          (maxPrice === undefined || product.price <= maxPrice) &&
+          (!query.q || product.name.toLowerCase().includes(query.q.toLowerCase())),
+        )
+        .sort((a, b) => {
+          if (query.sort === "newest") return b.createdAt.localeCompare(a.createdAt);
+          if (query.sort === "price-asc" || query.sort === "price-desc") return (a.price - b.price) * direction;
+          return b.popularity - a.popularity;
+        });
+      const total = demoResults.length;
+      return Response.json({
+        products: demoResults.slice((page - 1) * limit, page * limit),
+        categories: demoCategories.map((category, index) => ({
+          id: `demo_category_${category.slug}`,
+          ...category,
+          createdAt: new Date("2025-01-01T00:00:00.000Z").toISOString(),
+          _count: { products: [2, 1, 1][index] },
+        })),
+        pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+        demoMode: true,
+      });
+    }
+
     const [products, total, categories] = await prisma.$transaction([
       prisma.product.findMany({
         where,
@@ -61,7 +90,7 @@ export async function GET(request: Request) {
       prisma.product.count({ where }),
       prisma.category.findMany({ orderBy: { name: "asc" } }),
     ]);
-    return Response.json({ products, categories, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+    return Response.json({ products, categories, pagination: { page, limit, total, pages: Math.ceil(total / limit) }, demoMode: false });
   } catch (error) {
     return errorResponse(error);
   }
