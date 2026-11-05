@@ -7,12 +7,12 @@ import { useCartStore } from "@/store/cart";
 
 export function StoreHeader() {
   const items = useCartStore((state) => state.items);
-  const [user, setUser] = useState<{ name: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; role: "CUSTOMER" | "ADMIN" } | null>(null);
 
   useEffect(() => {
     fetch("/api/auth/me").then(async (response) => {
       if (response.ok) {
-        const data = (await response.json()) as { user: { name: string } };
+        const data = (await response.json()) as { user: { name: string; role: "CUSTOMER" | "ADMIN" } };
         setUser(data.user);
       }
     }).catch(() => undefined);
@@ -30,6 +30,7 @@ export function StoreHeader() {
         <Link href="/#story">Our story</Link>
       </nav>
       <div className="header-actions">
+        {user?.role === "ADMIN" ? <Link className="account-link admin-nav-link" href="/admin">Admin</Link> : null}
         <Link className="account-link" href={user ? "/account" : "/login"}>
           {user ? user.name.split(" ")[0] : "Account"} <ArrowUpRight size={14} />
         </Link>

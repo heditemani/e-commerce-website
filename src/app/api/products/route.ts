@@ -37,7 +37,7 @@ export async function GET(request: Request) {
     const { page, limit, minPrice, maxPrice } = query;
     const where: Prisma.ProductWhereInput = {
       ...(query.category ? { category: { slug: query.category } } : {}),
-      ...(query.q ? { name: { contains: query.q, mode: "insensitive" } } : {}),
+      ...(query.q ? { name: { contains: query.q } } : {}),
       ...(minPrice !== undefined || maxPrice !== undefined
         ? { price: { ...(minPrice !== undefined ? { gte: minPrice } : {}), ...(maxPrice !== undefined ? { lte: maxPrice } : {}) } }
         : {}),

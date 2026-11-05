@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { ArrowDown, ArrowRight, SlidersHorizontal } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import type { Product } from "@/types/store";
@@ -46,6 +47,11 @@ export default function HomePage() {
   }, [query]);
 
   const categories = data?.categories ?? [];
+  const categoryImages: Record<string, string> = {
+    "home-living": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1000&q=85",
+    accessories: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=1000&q=85",
+    apparel: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1000&q=85",
+  };
   return (
     <>
       <section className="hero">
@@ -56,16 +62,44 @@ export default function HomePage() {
           <a className="button button-dark" href="#shop">Explore the collection <ArrowRight size={16} /></a>
           <span className="hero-note">DESIGNED WITH INTENTION · MADE TO LAST</span>
         </div>
-        <div className="hero-art" role="img" aria-label="Warm, considered objects for everyday living">
-          <div className="art-sun" />
-          <div className="art-vase art-vase-one" />
-          <div className="art-vase art-vase-two" />
-          <div className="art-book art-book-one" />
-          <div className="art-book art-book-two" />
+        <div className="hero-art">
+          <Image
+            className="hero-photo"
+            src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1800&q=90"
+            alt="Sunlit, thoughtfully furnished living space"
+            fill
+            priority
+            sizes="(max-width: 650px) 90vw, 48vw"
+          />
           <span className="art-caption">THE SLOW LIVING EDIT<br />NO. 04 — AUTUMN / WINTER</span>
           <span className="art-index">01 / 04</span>
         </div>
         <div className="hero-bottom"><span>01 — OBJECTS WITH A POINT OF VIEW</span><ArrowDown size={16} /><span>SCROLL TO DISCOVER</span></div>
+      </section>
+
+      <section className="category-section" aria-labelledby="category-title">
+        <div className="category-heading">
+          <div><p className="eyebrow">A GOOD PLACE TO START</p><h2 id="category-title">Find your <em>kind of good.</em></h2></div>
+          <span>THOUGHTFUL THINGS, FOR EVERYDAY LIVING</span>
+        </div>
+        <div className="category-grid">
+          {categories.map((item, index) => (
+            <button
+              className={`category-tile category-tile-${index + 1}`}
+              key={item.id}
+              onClick={() => {
+                setCategory(item.slug);
+                setPage(1);
+                document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              <Image src={categoryImages[item.slug] ?? categoryImages["home-living"]} alt="" fill sizes="(max-width: 650px) 90vw, 30vw" />
+              <span className="category-shade" />
+              <span className="category-copy"><small>THE COLLECTION</small><strong>{item.name}</strong></span>
+              <span className="category-arrow"><ArrowRight size={17} /></span>
+            </button>
+          ))}
+        </div>
       </section>
 
       <section className="shop-section" id="shop">
@@ -90,7 +124,7 @@ export default function HomePage() {
           <label className="sort-control"><span>SORT</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="popular">Most loved</option><option value="newest">Just in</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option></select></label>
         </div>
         {error ? <div className="message-box error-message">{error}</div> : null}
-        {data?.demoMode ? <div className="message-box demo-notice">Preview catalog is active. Configure PostgreSQL to enable live products, accounts, and checkout.</div> : null}
+        {data?.demoMode ? <div className="message-box demo-notice">Preview collection is active. Run <code>npm run db:setup</code> to enable accounts, inventory, and checkout.</div> : null}
         {loading ? <div className="loading-grid">{Array.from({ length: 4 }, (_, index) => <div className="skeleton" key={index} />)}</div> : null}
         {!loading && !error && data?.products.length === 0 ? <div className="empty-state"><p>No pieces found in this collection.</p><button className="text-button" onClick={() => { setCategory(""); setMinPrice(""); setMaxPrice(""); }}>Clear filters <ArrowRight size={14} /></button></div> : null}
         {!loading && !error && data?.products.length ? (
@@ -102,6 +136,22 @@ export default function HomePage() {
             </div> : null}
           </>
         ) : null}
+      </section>
+
+      <section className="editorial-banner">
+        <Image
+          src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=2000&q=90"
+          alt="An inviting, sunlit home with natural textures"
+          fill
+          sizes="100vw"
+        />
+        <div className="editorial-overlay" />
+        <div className="editorial-content">
+          <p className="eyebrow">A LITTLE MORE INTENTION, EVERY DAY</p>
+          <h2>Make everyday<br />feel a little <em>more yours.</em></h2>
+          <a className="button button-light" href="#shop">Find your next favorite <ArrowRight size={15} /></a>
+        </div>
+        <span className="editorial-caption">SHOPIT JOURNAL / ISSUE NO. 01</span>
       </section>
 
       <section className="story-section" id="story">

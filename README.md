@@ -1,25 +1,22 @@
 # Shopit e-commerce starter
 
-A TypeScript storefront starter built with Next.js App Router, Prisma, PostgreSQL, Zustand, and cookie-based JWT sessions.
+A TypeScript storefront built with Next.js App Router, Prisma, SQLite for local development, Zustand, and cookie-based JWT sessions.
 
 ## Get started
 
-1. Install Node.js 20.9 or newer and PostgreSQL.
-2. Copy `.env.example` to `.env` and set `DATABASE_URL` and a random `AUTH_SECRET` (at least 32 characters).
-3. Install dependencies and initialize the database:
+1. Install Node.js 20.9 or newer.
+2. Install dependencies and initialize the local database, sample catalog, and administrator:
 
    ```sh
    npm install
-   npx prisma migrate dev --name init
-   npm run db:seed
+   npm run db:setup
    npm run dev
    ```
 
-4. Visit `http://localhost:3000`, create a customer account, and try the demo checkout. Payment is simulated; no card information is collected.
+3. Visit `http://localhost:3000`. Sign in with the admin credentials in your ignored `.env` file and open **Admin** to manage products, stock, and order fulfillment.
+4. Customers can create accounts from **Account → Create an account**, then check out. Payment is simulated; no card information is collected.
 
-Without `DATABASE_URL`, the catalog and product detail pages use the included read-only preview products so the storefront can be browsed before PostgreSQL is configured. Accounts, administration, and checkout require the database.
-
-The seed script creates the starter categories. To grant an account product/order administration access, set its `role` to `ADMIN` in the database. Public sign-up never grants administrator privileges.
+`npm run db:setup` generates a private `.env`, a random administrator password, migrates the local SQLite database, and seeds sample products. The administrator email is `admin@shopit.local`; its generated password is stored as `ADMIN_PASSWORD` in `.env`. To choose credentials yourself, set `ADMIN_EMAIL` and `ADMIN_PASSWORD` (minimum 12 characters) in `.env` and run `npm run db:admin`. Public sign-up never grants administrator privileges.
 
 ## API overview
 
