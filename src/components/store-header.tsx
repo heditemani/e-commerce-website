@@ -21,9 +21,9 @@ export function StoreHeader() {
   const count = items.reduce((total, item) => total + item.quantity, 0);
   return (
     <header className="site-header">
-      <Link className="brand" href="/" aria-label="Atelier home">
-        <span className="brand-mark">A</span>
-        <span>atelier<span className="brand-period">.</span></span>
+      <Link className="brand" href="/" aria-label="Shopit home">
+        <span className="brand-mark">S</span>
+        <span>Shopit<span className="brand-period">.</span></span>
       </Link>
       <nav className="main-nav" aria-label="Main navigation">
         <Link href="/#shop">Shop</Link>

@@ -1,4 +1,4 @@
-# Atelier e-commerce starter
+# Shopit e-commerce starter
 
 A TypeScript storefront starter built with Next.js App Router, Prisma, PostgreSQL, Zustand, and cookie-based JWT sessions.
 

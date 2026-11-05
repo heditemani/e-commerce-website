@@ -5,8 +5,8 @@ import { StoreHeader } from "@/components/store-header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Atelier — thoughtfully made, made to last",
-  description: "Everyday objects and considered essentials for a more intentional life.",
+  title: "Shopit — thoughtfully made, made to last",
+  description: "Shopit — everyday finds and essentials for a more intentional life.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <footer className="site-footer">
           <LinkText />
           <span>Thoughtful things, made for everyday.</span>
-          <span>© {new Date().getFullYear()} Atelier</span>
+          <span>© {new Date().getFullYear()} Shopit</span>
         </footer>
       </body>
     </html>
@@ -27,5 +27,5 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 }
 
 function LinkText() {
-  return <Link className="footer-brand" href="/">atelier<span className="brand-period">.</span></Link>;
+  return <Link className="footer-brand" href="/">Shopit<span className="brand-period">.</span></Link>;
 }
