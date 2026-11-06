@@ -17,9 +17,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <StoreHeader />
         <main>{children}</main>
         <footer className="site-footer">
-          <LinkText />
-          <span>Thoughtful things, made for everyday.</span>
-          <span>© {new Date().getFullYear()} Shopit</span>
+          <div className="footer-brand-block"><LinkText /><span>Thoughtful things, made for everyday.</span></div>
+          <div className="footer-link-group"><span className="eyebrow">EXPLORE</span><Link href="/collections">Collections</Link><Link href="/about">Our story</Link><Link href="/search">Search</Link></div>
+          <div className="footer-link-group"><span className="eyebrow">HERE TO HELP</span><Link href="/contact">Contact us</Link><Link href="/faq">FAQs</Link><Link href="/shipping">Shipping</Link><Link href="/returns">Returns</Link></div>
+          <div className="footer-link-group"><span className="eyebrow">THE DETAILS</span><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/account">My account</Link></div>
+          <div className="footer-copyright">© {new Date().getFullYear()} Shopit</div>
         </footer>
       </body>
     </html>

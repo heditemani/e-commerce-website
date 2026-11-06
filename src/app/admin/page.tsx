@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Boxes, CircleDollarSign, PackageCheck, Plus, RefreshCw, ShoppingBag } from "lucide-react";
+import { ArrowRight, Boxes, CircleDollarSign, MessageCircle, PackageCheck, Plus, RefreshCw, ShoppingBag } from "lucide-react";
 import type { Product } from "@/types/store";
 
 type Order = {
@@ -16,8 +16,18 @@ type Order = {
   items: { id: string; name: string; quantity: number }[];
 };
 type Category = { id: string; name: string; slug: string };
+type ContactMessage = {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: string;
+  createdAt: string;
+};
 type ProductResponse = { products: Product[]; categories: Category[] };
 type OrderResponse = { orders: Order[] };
+type MessageResponse = { messages: ContactMessage[] };
 type UserResponse = { user: { role: string; name: string } };
 
 const orderStatuses = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
@@ -27,6 +37,7 @@ export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
@@ -48,16 +59,19 @@ export default function AdminPage() {
         return;
       }
 
-      const [productResponse, orderResponse] = await Promise.all([
+      const [productResponse, orderResponse, messageResponse] = await Promise.all([
         fetch("/api/products?limit=48&sort=newest"),
         fetch("/api/orders"),
+        fetch("/api/contact"),
       ]);
-      if (!productResponse.ok || !orderResponse.ok) throw new Error("Unable to load your store data.");
+      if (!productResponse.ok || !orderResponse.ok || !messageResponse.ok) throw new Error("Unable to load your store data.");
       const productData = await productResponse.json() as ProductResponse;
       const orderData = await orderResponse.json() as OrderResponse;
+      const messageData = await messageResponse.json() as MessageResponse;
       setProducts(productData.products);
       setCategories(productData.categories);
       setOrders(orderData.orders);
+      setMessages(messageData.messages);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Something went wrong.");
     } finally {
@@ -101,6 +115,27 @@ export default function AdminPage() {
       const result = await response.json() as { error?: string };
       if (!response.ok) throw new Error(result.error ?? "Unable to update inventory.");
       setNotice("Inventory updated.");
+      await loadDashboard();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Something went wrong.");
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function updateMessageStatus(messageId: string, status: string) {
+    setBusy(messageId);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch("/api/contact", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId, status }),
+      });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error ?? "Unable to update this message.");
+      setNotice("Enquiry status updated.");
       await loadDashboard();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Something went wrong.");
@@ -162,6 +197,7 @@ export default function AdminPage() {
         <article className="admin-stat"><span className="admin-stat-icon"><CircleDollarSign size={17} /></span><span className="eyebrow">ORDER REVENUE</span><strong>${(revenue / 100).toFixed(2)}</strong><small>Excludes cancelled orders</small></article>
         <article className="admin-stat"><span className="admin-stat-icon"><ShoppingBag size={17} /></span><span className="eyebrow">ALL ORDERS</span><strong>{orders.length}</strong><small>{pendingOrders} need attention</small></article>
         <article className="admin-stat"><span className="admin-stat-icon"><Boxes size={17} /></span><span className="eyebrow">LIVE PRODUCTS</span><strong>{products.length}</strong><small>{lowStock} running low on stock</small></article>
+        <article className="admin-stat"><span className="admin-stat-icon"><MessageCircle size={17} /></span><span className="eyebrow">NEW ENQUIRIES</span><strong>{messages.filter((message) => message.status === "NEW").length}</strong><small>{messages.length} messages in your inbox</small></article>
       </div>
 
       <section className="admin-panel">
@@ -196,6 +232,15 @@ export default function AdminPage() {
           <label className="admin-status-select"><span className="visually-hidden">Update order status</span><select aria-label={`Status for order ${order.id}`} value={order.status} disabled={busy === order.id} onChange={(event) => void updateOrderStatus(order.id, event.target.value)}>{orderStatuses.map((status) => <option key={status} value={status}>{status}</option>)}</select></label>
         </article>)}
         {!orders.length ? <p className="admin-empty">No orders yet. Customer orders will appear here.</p> : null}
+      </section>
+
+      <section className="admin-panel admin-inbox">
+        <div className="admin-panel-heading"><div><p className="eyebrow">A NOTE FROM THE COMMUNITY</p><h2>Contact <em>inbox.</em></h2></div><span className="admin-orders-count">{messages.length} MESSAGES</span></div>
+        {messages.map((message) => <details className="admin-message" key={message.id}>
+          <summary><span className={`admin-message-status status-${message.status.toLowerCase()}`}>{message.status}</span><strong>{message.subject}</strong><span>{message.name} · {message.email}</span><time>{new Date(message.createdAt).toLocaleDateString()}</time></summary>
+          <div className="admin-message-body"><p>{message.message}</p><div><a className="text-button" href={`mailto:${encodeURIComponent(message.email)}?subject=${encodeURIComponent(`Re: ${message.subject}`)}`}>Reply by email <ArrowRight size={13} /></a><label className="admin-status-select"><span className="visually-hidden">Enquiry status</span><select aria-label={`Status for enquiry ${message.subject}`} value={message.status} disabled={busy === message.id} onChange={(event) => void updateMessageStatus(message.id, event.target.value)}><option value="NEW">NEW</option><option value="READ">READ</option><option value="RESOLVED">RESOLVED</option></select></label></div></div>
+        </details>)}
+        {!messages.length ? <p className="admin-empty">No enquiries yet. Customer messages will appear here.</p> : null}
       </section>
     </section>
   );

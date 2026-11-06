@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowDown, ArrowRight, SlidersHorizontal } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import type { Product } from "@/types/store";
@@ -59,7 +60,7 @@ export default function HomePage() {
           <p className="eyebrow hero-kicker"><span className="status-dot" /> SMALL BATCH. BIG PURPOSE.</p>
           <h1>Make room<br />for <em>better.</em></h1>
           <p className="hero-description">Thoughtfully made essentials for the rituals, routines, and little moments that make a life.</p>
-          <a className="button button-dark" href="#shop">Explore the collection <ArrowRight size={16} /></a>
+          <Link className="button button-dark" href="/collections">Explore the collection <ArrowRight size={16} /></Link>
           <span className="hero-note">DESIGNED WITH INTENTION · MADE TO LAST</span>
         </div>
         <div className="hero-art">
@@ -84,20 +85,16 @@ export default function HomePage() {
         </div>
         <div className="category-grid">
           {categories.map((item, index) => (
-            <button
+            <a
               className={`category-tile category-tile-${index + 1}`}
+              href={`/collections/${item.slug}`}
               key={item.id}
-              onClick={() => {
-                setCategory(item.slug);
-                setPage(1);
-                document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" });
-              }}
             >
               <Image src={categoryImages[item.slug] ?? categoryImages["home-living"]} alt="" fill sizes="(max-width: 650px) 90vw, 30vw" />
               <span className="category-shade" />
               <span className="category-copy"><small>THE COLLECTION</small><strong>{item.name}</strong></span>
               <span className="category-arrow"><ArrowRight size={17} /></span>
-            </button>
+            </a>
           ))}
         </div>
       </section>
@@ -158,7 +155,7 @@ export default function HomePage() {
         <span className="story-number">A NOTE ON BUYING BETTER / 001</span>
         <div><p className="eyebrow">LESS, BUT MEANINGFUL</p><h2>Good things<br />take <em>thought.</em></h2></div>
         <p className="story-copy">We believe the things you live with should earn their place. So we work with good people, honest materials, and makers who care about the details you can feel—even when you can’t see them.</p>
-        <a className="text-button" href="#shop">A little more about us <ArrowRight size={15} /></a>
+        <a className="text-button" href="/about">A little more about us <ArrowRight size={15} /></a>
       </section>
     </>
   );
