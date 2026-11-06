@@ -10,7 +10,7 @@ import type { Product } from "@/types/store";
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
   const addItem = useCartStore((state) => state.addItem);
   const toggleFavorite = useCartStore((state) => state.toggleFavorite);
-  const isFavorite = useCartStore((state) => state.favoriteIds.includes(product.id));
+  const isFavorite = useCartStore((state) => state.favoriteProducts.some((favorite) => favorite.id === product.id));
   const [added, setAdded] = useState(false);
   return (
     <article className="product-card" style={{ animationDelay: `${index * 70}ms` }}>
@@ -20,7 +20,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           {product.compareAt && product.compareAt > product.price ? <span className="badge">Sale</span> : null}
           <span className="image-arrow"><ArrowUpRight size={17} /></span>
         </Link>
-        <button className={isFavorite ? "favorite-button is-favorite" : "favorite-button"} type="button" aria-label={isFavorite ? `Remove ${product.name} from saved pieces` : `Save ${product.name}`} aria-pressed={isFavorite} onClick={() => toggleFavorite(product.id)}>
+        <button className={isFavorite ? "favorite-button is-favorite" : "favorite-button"} type="button" aria-label={isFavorite ? `Remove ${product.name} from saved pieces` : `Save ${product.name}`} aria-pressed={isFavorite} onClick={() => toggleFavorite(product)}>
           <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
         </button>
       </div>

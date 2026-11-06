@@ -510,6 +510,14 @@ h1 em, h2 em { color: var(--green); }
 .shipping-progress-copy strong { color: var(--ink); font-weight: 600; }
 .shipping-progress-track { height: 6px; overflow: hidden; border-radius: 999px; background: var(--paper-deep); }
 .shipping-progress-track span { display: block; height: 100%; border-radius: inherit; background: var(--green); transition: width .3s ease; }
+.favorites-page { padding: 50px 9% 105px; }
+.favorites-page .page-heading { margin-bottom: 30px; }
+.empty-favorites { min-height: 45vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.empty-favorites > svg { margin-bottom: 15px; color: var(--accent); }
+.empty-favorites h2 { margin: 0; font-family: var(--serif); font-size: 30px; font-weight: 500; }
+.empty-favorites > p { max-width: 360px; margin: 10px 0 20px; color: var(--muted); font-size: 11px; line-height: 1.7; }
+.favorite-link { position: relative; display: inline-flex; align-items: center; color: var(--ink); }
+.favorite-count { position: absolute; top: -8px; right: -9px; min-width: 15px; height: 15px; display: grid; place-items: center; padding: 0 3px; border-radius: 999px; background: var(--paper-deep); font-size: 8px; }
 
 :root { color-scheme: light; }
 body { background: var(--paper); color: var(--ink); }
@@ -549,6 +557,7 @@ h1 em, h2 em { color: var(--green); }
 .bag-count { background: var(--paper-deep); color: var(--ink); }
 .empty-bag-mark { border-color: var(--green); color: var(--green); }
 .content-page-image { border-radius: 26px; }
+.favorites-page { padding-left: 7.1%; padding-right: 7.1%; }
 
 @media (max-width: 650px) {
   .catalog-toolbar { gap: 10px; }
@@ -558,6 +567,8 @@ h1 em, h2 em { color: var(--green); }
   .advanced-filters-title { flex-basis: 100%; }
   .results-count { margin-top: 0; }
   .hero-art { border-radius: 24px 24px 24px 78px; }
+  .favorites-page { padding: 33px 5% 72px; }
+  .header-actions { gap: 13px; }
 }
 
 .content-page { padding: 62px 7.1% 95px; }

@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Search, ShoppingBag } from "lucide-react";
+import { ArrowUpRight, Heart, Search, ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 
 export function StoreHeader() {
   const items = useCartStore((state) => state.items);
+  const favorites = useCartStore((state) => state.favoriteProducts);
   const [user, setUser] = useState<{ name: string; role: "CUSTOMER" | "ADMIN" } | null>(null);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ export function StoreHeader() {
       <div className="header-actions">
         {user?.role === "ADMIN" ? <Link className="account-link admin-nav-link" href="/admin">Admin</Link> : null}
         <Link className="header-search-link" href="/search" aria-label="Search Shopit"><Search size={17} /></Link>
+        <Link className="favorite-link" href="/favorites" aria-label={`Saved pieces, ${favorites.length} items`}><Heart size={17} /><span className="favorite-count">{favorites.length}</span></Link>
         <Link className="account-link" href={user ? "/account" : "/login"}>
           {user ? user.name.split(" ")[0] : "Account"} <ArrowUpRight size={14} />
         </Link>
