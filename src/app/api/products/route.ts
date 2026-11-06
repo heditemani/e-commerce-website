@@ -59,7 +59,8 @@ export async function GET(request: Request) {
 
     if (!process.env.DATABASE_URL) {
       const direction = query.sort.endsWith("desc") ? -1 : 1;
-      const demoResults = getDemoProducts()
+      const demoCatalog = getDemoProducts();
+      const demoResults = demoCatalog
         .filter((product) =>
           (!query.category || product.category.slug === query.category) &&
           (minPrice === undefined || product.price >= minPrice) &&
@@ -77,11 +78,11 @@ export async function GET(request: Request) {
       const total = demoResults.length;
       return Response.json({
         products: demoResults.slice((page - 1) * limit, page * limit),
-        categories: demoCategories.map((category, index) => ({
+        categories: demoCategories.map((category) => ({
           id: `demo_category_${category.slug}`,
           ...category,
           createdAt: new Date("2025-01-01T00:00:00.000Z").toISOString(),
-          _count: { products: [2, 1, 1][index] },
+          _count: { products: demoCatalog.filter((product) => product.category.slug === category.slug).length },
         })),
         pagination: { page, limit, total, pages: Math.ceil(total / limit) },
         demoMode: true,

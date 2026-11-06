@@ -16,7 +16,7 @@ A TypeScript storefront built with Next.js App Router, Prisma, SQLite for local 
 3. Visit `http://localhost:3000`. Sign in with the admin credentials in your ignored `.env` file and open **Admin** to manage products, stock, and order fulfillment.
 4. Customers can create accounts from **Account → Create an account**, then check out. Payment is simulated; no card information is collected.
 
-`npm run db:setup` generates a private `.env`, a random administrator password, migrates the local SQLite database, and seeds sample products. The administrator email is `admin@shopit.local`; its generated password is stored as `ADMIN_PASSWORD` in `.env`. To choose credentials yourself, set `ADMIN_EMAIL` and `ADMIN_PASSWORD` (minimum 12 characters) in `.env` and run `npm run db:admin`. Public sign-up never grants administrator privileges.
+`npm run db:setup` generates a private `.env`, a random administrator password, migrates the local SQLite database, and seeds 1,200 additional catalog products across home, accessories, and apparel, alongside the four curated demo products. Seeded catalog entries have stable names and slugs, varied prices and inventory, product options, sale and featured items, and category-specific imagery. You can safely rerun `npm run db:seed`; existing products are preserved and generated entries are not duplicated. The administrator email is `admin@shopit.local`; its generated password is stored as `ADMIN_PASSWORD` in `.env`. To choose credentials yourself, set `ADMIN_EMAIL` and `ADMIN_PASSWORD` (minimum 12 characters) in `.env` and run `npm run db:admin`. Public sign-up never grants administrator privileges.
 
 ## Store pages
 
@@ -24,7 +24,7 @@ The storefront includes `/collections` and category-specific collection pages, `
 
 ## API overview
 
-- `GET /api/products` — category, price, search, sort (`popular`, `newest`, `price-asc`, `price-desc`), and pagination filters.
+- `GET /api/products` — category, price, search, stock, sale, featured, sort (`popular`, `newest`, `price-asc`, `price-desc`), and pagination filters.
 - `GET /api/products/:slug` — product detail.
 - `POST /api/products`, `PATCH /api/products/:slug`, `DELETE /api/products/:slug` — administrator product management.
 - `POST /api/auth/signup`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me` — account/session endpoints.
