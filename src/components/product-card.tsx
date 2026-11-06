@@ -2,19 +2,28 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, Plus } from "lucide-react";
+import { ArrowUpRight, Check, Heart, Plus } from "lucide-react";
+import { useState } from "react";
 import { useCartStore } from "@/store/cart";
 import type { Product } from "@/types/store";
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
   const addItem = useCartStore((state) => state.addItem);
+  const toggleFavorite = useCartStore((state) => state.toggleFavorite);
+  const isFavorite = useCartStore((state) => state.favoriteIds.includes(product.id));
+  const [added, setAdded] = useState(false);
   return (
     <article className="product-card" style={{ animationDelay: `${index * 70}ms` }}>
-      <Link className="product-image" href={`/products/${product.slug}`} aria-label={`View ${product.name}`}>
-        {product.images[0] ? <Image src={product.images[0]} alt={product.name} fill sizes="(max-width: 650px) 45vw, (max-width: 900px) 30vw, 22vw" /> : <div className="image-placeholder" />}
-        {product.compareAt && product.compareAt > product.price ? <span className="badge">Sale</span> : null}
-        <span className="image-arrow"><ArrowUpRight size={17} /></span>
-      </Link>
+      <div className="product-visual">
+        <Link className="product-image" href={`/products/${product.slug}`} aria-label={`View ${product.name}`}>
+          {product.images[0] ? <Image src={product.images[0]} alt={product.name} fill sizes="(max-width: 650px) 45vw, (max-width: 900px) 30vw, 22vw" /> : <div className="image-placeholder" />}
+          {product.compareAt && product.compareAt > product.price ? <span className="badge">Sale</span> : null}
+          <span className="image-arrow"><ArrowUpRight size={17} /></span>
+        </Link>
+        <button className={isFavorite ? "favorite-button is-favorite" : "favorite-button"} type="button" aria-label={isFavorite ? `Remove ${product.name} from saved pieces` : `Save ${product.name}`} aria-pressed={isFavorite} onClick={() => toggleFavorite(product.id)}>
+          <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
+        </button>
+      </div>
       <div className="product-meta">
         <div>
           <p className="eyebrow">{product.category.name}</p>
@@ -28,11 +37,15 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
         </div>
         <button
           className="icon-button add-button"
-          aria-label={`Add ${product.name} to cart`}
+          aria-label={added ? `${product.name} added to cart` : `Add ${product.name} to cart`}
           disabled={product.stock < 1}
-          onClick={() => addItem(product)}
+          onClick={() => {
+            addItem(product);
+            setAdded(true);
+            window.setTimeout(() => setAdded(false), 1500);
+          }}
         >
-          <Plus size={19} />
+          {added ? <Check size={17} /> : <Plus size={19} />}
         </button>
       </div>
     </article>

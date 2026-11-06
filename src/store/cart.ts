@@ -13,8 +13,10 @@ const serverStorage: StateStorage = {
 
 type CartState = {
   items: CartItem[];
+  favoriteIds: string[];
   hydrated: boolean;
   addItem: (product: Product, quantity?: number, variant?: Record<string, string>) => void;
+  toggleFavorite: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number, variant?: Record<string, string>) => void;
   removeItem: (productId: string, variant?: Record<string, string>) => void;
   clearCart: () => void;
@@ -29,7 +31,14 @@ export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
       items: [],
+      favoriteIds: [],
       hydrated: false,
+      toggleFavorite: (productId) =>
+        set((state) => ({
+          favoriteIds: state.favoriteIds.includes(productId)
+            ? state.favoriteIds.filter((id) => id !== productId)
+            : [...state.favoriteIds, productId],
+        })),
       addItem: (product, quantity = 1, variant) =>
         set((state) => {
           const index = state.items.findIndex(
@@ -66,7 +75,7 @@ export const useCartStore = create<CartState>()(
       name: "atelier-cart",
       storage: createJSONStorage(() => (typeof window === "undefined" ? serverStorage : window.localStorage)),
       skipHydration: true,
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({ items: state.items, favoriteIds: state.favoriteIds }),
       onRehydrateStorage: () => (state) => state?.setHydrated(true),
     },
   ),

@@ -25,6 +25,9 @@ const querySchema = z.object({
   maxPrice: z.coerce.number().int().nonnegative().optional(),
   category: z.string().trim().min(1).max(180).optional(),
   q: z.string().trim().max(100).optional(),
+  inStock: z.enum(["true", "false"]).transform((value) => value === "true").optional(),
+  onSale: z.enum(["true", "false"]).transform((value) => value === "true").optional(),
+  featured: z.enum(["true", "false"]).transform((value) => value === "true").optional(),
   sort: z.enum(["popular", "newest", "price-asc", "price-desc"]).default("popular"),
 }).refine((value) => value.minPrice === undefined || value.maxPrice === undefined || value.minPrice <= value.maxPrice, {
   message: "minPrice cannot be greater than maxPrice",
@@ -38,6 +41,9 @@ export async function GET(request: Request) {
     const where: Prisma.ProductWhereInput = {
       ...(query.category ? { category: { slug: query.category } } : {}),
       ...(query.q ? { name: { contains: query.q } } : {}),
+      ...(query.inStock ? { stock: { gt: 0 } } : {}),
+      ...(query.onSale ? { compareAt: { not: null } } : {}),
+      ...(query.featured ? { featured: true } : {}),
       ...(minPrice !== undefined || maxPrice !== undefined
         ? { price: { ...(minPrice !== undefined ? { gte: minPrice } : {}), ...(maxPrice !== undefined ? { lte: maxPrice } : {}) } }
         : {}),
@@ -58,6 +64,9 @@ export async function GET(request: Request) {
           (!query.category || product.category.slug === query.category) &&
           (minPrice === undefined || product.price >= minPrice) &&
           (maxPrice === undefined || product.price <= maxPrice) &&
+          (!query.inStock || product.stock > 0) &&
+          (!query.onSale || (product.compareAt !== null && product.compareAt > product.price)) &&
+          (!query.featured || product.featured) &&
           (!query.q || product.name.toLowerCase().includes(query.q.toLowerCase())),
         )
         .sort((a, b) => {

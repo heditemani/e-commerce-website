@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ArrowRight, SlidersHorizontal } from "lucide-react";
+import { ArrowDown, ArrowRight, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import type { Product } from "@/types/store";
 
@@ -20,6 +20,10 @@ export default function HomePage() {
   const [sort, setSort] = useState("popular");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [inStock, setInStock] = useState(false);
+  const [onSale, setOnSale] = useState(false);
+  const [featured, setFeatured] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,8 +33,21 @@ export default function HomePage() {
     if (category) params.set("category", category);
     if (minPrice) params.set("minPrice", String(Math.round(Number(minPrice) * 100)));
     if (maxPrice) params.set("maxPrice", String(Math.round(Number(maxPrice) * 100)));
+    if (inStock) params.set("inStock", "true");
+    if (onSale) params.set("onSale", "true");
+    if (featured) params.set("featured", "true");
     return params.toString();
-  }, [category, maxPrice, minPrice, page, sort]);
+  }, [category, featured, inStock, maxPrice, minPrice, onSale, page, sort]);
+
+  const clearFilters = () => {
+    setCategory("");
+    setMinPrice("");
+    setMaxPrice("");
+    setInStock(false);
+    setOnSale(false);
+    setFeatured(false);
+    setPage(1);
+  };
 
   useEffect(() => {
     let active = true;
@@ -119,11 +136,24 @@ export default function HomePage() {
             <label className="price-filter"><span>$</span><input aria-label="Maximum price in dollars" type="number" min="0" placeholder="Max" value={maxPrice} onChange={(event) => { setMaxPrice(event.target.value); setPage(1); }} /></label>
           </div>
           <label className="sort-control"><span>SORT</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="popular">Most loved</option><option value="newest">Just in</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option></select></label>
+          <button className="advanced-filter-toggle" type="button" aria-expanded={advancedOpen} onClick={() => setAdvancedOpen((open) => !open)}>
+            More filters <ChevronDown size={14} />
+          </button>
         </div>
+        {advancedOpen ? (
+          <div className="advanced-filters">
+            <span className="advanced-filters-title">NARROW YOUR EDIT</span>
+            <label className="filter-check"><input type="checkbox" checked={inStock} onChange={(event) => { setInStock(event.target.checked); setPage(1); }} /> In stock</label>
+            <label className="filter-check"><input type="checkbox" checked={onSale} onChange={(event) => { setOnSale(event.target.checked); setPage(1); }} /> On sale</label>
+            <label className="filter-check"><input type="checkbox" checked={featured} onChange={(event) => { setFeatured(event.target.checked); setPage(1); }} /> Featured pieces</label>
+            <button className="clear-filters" type="button" onClick={clearFilters}>Clear all</button>
+          </div>
+        ) : null}
+        {data ? <p className="results-count">{data.pagination.total} thoughtful {data.pagination.total === 1 ? "find" : "finds"}</p> : null}
         {error ? <div className="message-box error-message">{error}</div> : null}
         {data?.demoMode ? <div className="message-box demo-notice">Preview collection is active. Run <code>npm run db:setup</code> to enable accounts, inventory, and checkout.</div> : null}
         {loading ? <div className="loading-grid">{Array.from({ length: 4 }, (_, index) => <div className="skeleton" key={index} />)}</div> : null}
-        {!loading && !error && data?.products.length === 0 ? <div className="empty-state"><p>No pieces found in this collection.</p><button className="text-button" onClick={() => { setCategory(""); setMinPrice(""); setMaxPrice(""); }}>Clear filters <ArrowRight size={14} /></button></div> : null}
+        {!loading && !error && data?.products.length === 0 ? <div className="empty-state"><p>No pieces found in this collection.</p><button className="text-button" onClick={clearFilters}>Clear filters <ArrowRight size={14} /></button></div> : null}
         {!loading && !error && data?.products.length ? (
           <>
             <div className="product-grid">{data.products.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}</div>

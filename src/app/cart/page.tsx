@@ -11,6 +11,7 @@ export default function CartPage() {
   const tax = Math.round(subtotal * 0.08);
   const shipping = subtotal >= 10000 ? 0 : items.length ? 800 : 0;
   const total = subtotal + tax + shipping;
+  const shippingProgress = Math.min(100, (subtotal / 10000) * 100);
   if (!hydrated) return <div className="page-loading">Opening your bag…</div>;
 
   return (
@@ -27,7 +28,7 @@ export default function CartPage() {
             </article>)}
             <Link href="/#shop" className="continue-link"><ArrowRight size={14} /> Keep looking</Link>
           </div>
-          <aside className="order-summary"><p className="eyebrow">THE NUMBERS</p><h2>Order <em>summary.</em></h2><div className="summary-line"><span>Subtotal</span><span>${(subtotal / 100).toFixed(2)}</span></div><div className="summary-line"><span>Estimated tax</span><span>${(tax / 100).toFixed(2)}</span></div><div className="summary-line"><span>Shipping</span><span>{shipping ? "$8.00" : "Complimentary"}</span></div><div className="summary-note">Shipping is complimentary on orders over $100.</div><div className="summary-total"><span>Total</span><strong>${(total / 100).toFixed(2)}</strong></div><Link className="button button-dark checkout-button" href="/checkout">Continue to checkout <ArrowRight size={15} /></Link><p className="checkout-caption">SECURE CHECKOUT · PAYMENT SIMULATION</p></aside>
+          <aside className="order-summary"><p className="eyebrow">THE NUMBERS</p><h2>Order <em>summary.</em></h2><div className="shipping-progress"><div className="shipping-progress-copy">{subtotal >= 10000 ? <span>You unlocked complimentary shipping!</span> : <span>Add <strong>${((10000 - subtotal) / 100).toFixed(2)}</strong> for complimentary shipping</span>}<span>{Math.round(shippingProgress)}%</span></div><div className="shipping-progress-track" role="progressbar" aria-label="Progress toward complimentary shipping" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(shippingProgress)}><span style={{ width: `${shippingProgress}%` }} /></div></div><div className="summary-line"><span>Subtotal</span><span>${(subtotal / 100).toFixed(2)}</span></div><div className="summary-line"><span>Estimated tax</span><span>${(tax / 100).toFixed(2)}</span></div><div className="summary-line"><span>Shipping</span><span>{shipping ? "$8.00" : "Complimentary"}</span></div><div className="summary-note">Shipping is complimentary on orders over $100.</div><div className="summary-total"><span>Total</span><strong>${(total / 100).toFixed(2)}</strong></div><Link className="button button-dark checkout-button" href="/checkout">Continue to checkout <ArrowRight size={15} /></Link><p className="checkout-caption">SECURE CHECKOUT · PAYMENT SIMULATION</p></aside>
         </div>
       )}
     </section>
